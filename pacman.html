@@ -6,27 +6,55 @@
    <title>Controlling Robot</title>
 </head>
 <body>
-<p>Use arrow keys OR w, s, a, d to move around.</p>
-<canvas id="svs" width="250" height="250"></canvas>
-
-
-
+    <div>
+        <p>Use PLACE to put the Pacman on the grid in positon X, Y and facing NORTH, SOUTH, EAST or WEST.</p>
+        <div>
+            <button onclick="placeBtn()">PLACE</button>
+        </div>
+        <div class="canvas">
+            <canvas id="svs" width="250" height="250"></canvas>
+        </div>
+        <p>LEFT and RIGHT will rotate Pacman 90 degrees.</p>
+        <div>
+            <button onclick="leftBtn()">LEFT</button>
+            <button onclick="moveBtn()">MOVE</button>
+            <button onclick="rightBtn()">RIGHT</button>
+        </div>        
+        <div>
+            <button onclick="reportBtn()">REPORT</button>
+        </div>
+    </div>
 <style>
+body {
+    text-align: center;
+}
+p {
+    margin: auto;
+    width: 66%;
+    margin-top: 1em;
+}
+button {
+    margin: 1em 0em;
+}
 #svs {
     border: 1px solid black;
     background-size: 50px 50px;
     background-image: linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px);
+}
+.canvas {
+    display: inline-block;
+    padding: 3.4em;
+    background: url('bg.png') no-repeat;
+    background-size: contain;
 }
 </style>
 <script>
 var canvas = document.getElementById('svs');
 var ctx = canvas .getContext('2d');
 
-
-var canvasX = 103; //intial horizontal position of drawn Pacman (103)
-var canvasY = 103; //intial vertical position of drawn Pacman (103)
-var width = 50; //width of the drawn Pacman
-var height = 50; //height of the drawn Pacman
+var canvasX, canvasY;
+var width = 50;         //width of the drawn Pacman
+var height = 50;        //height of the drawn Pacman
 
 let img = new Image();
 img.src = 'pacman-sprite.png';
@@ -35,47 +63,189 @@ const FACING_DOWN = 47;
 const FACING_UP = 32;
 const FACING_LEFT = 17;
 const FACING_RIGHT = 0;
-let currentDirection = FACING_DOWN;
+var currentDirection = FACING_DOWN;
+var directionReport, canvasXReport, canvasYReport;
+
+img.onload = function() {
+    placeBtn();
+}
 
 function drawRect(direction, canvasX, canvasY, width, height) {
     //drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
     ctx.drawImage(img, 0, direction, 17, 17, canvasX, canvasY, width, height);
 }
 
-img.onload = function() {
-  init();
+function placeBtn() {
+    ctx.clearRect(0,0, 250, 250);
+    do{
+        canvasX = parseInt(window.prompt("Please input position X (1 - 5)", ""), 10);
+    }while(isNaN(canvasX) || canvasX > 5 || canvasX < 1);
+    switch(canvasX) {
+        case 1:
+            canvasX = 3;
+            break;
+        case 2:
+            canvasX = 53;
+            break;
+        case 3:
+            canvasX = 103;
+            break;
+        case 4:
+            canvasX = 153;
+            break;
+        case 5:
+            canvasX = 203;
+            break;
+    }
+    canvasX = parseInt(canvasX);
+    do{
+        canvasY = parseInt(window.prompt("Please input position Y (1 - 5)", ""), 10);
+    }while(isNaN(canvasY) || canvasY > 5 || canvasY < 1);
+    switch(canvasY) {
+        case 1:
+            canvasY = 203;
+            break;
+        case 2:
+            canvasY = 153;
+            break;
+        case 3:
+            canvasY = 103;
+            break;
+        case 4:
+            canvasY = 53;
+            break;
+        case 5:
+            canvasY = 3;
+            break;
+    }
+    canvasY = parseInt(canvasY);
+    currentDirection = window.prompt("Please input direction 'North', 'South', 'West', 'East' (Default: South)").toLowerCase();
+    switch(currentDirection) {
+        case "north":
+            currentDirection = FACING_UP;
+            break;
+        case "south":
+            currentDirection = FACING_DOWN;
+            break;
+        case "west":
+            currentDirection = FACING_LEFT;
+            break;
+        case "east":
+            currentDirection = FACING_RIGHT;
+            break;
+        default:
+            currentDirection = FACING_DOWN;
+    }
+    drawRect(currentDirection, canvasX, canvasY, width, height);
+}
+
+function leftBtn() {
+    switch(currentDirection) {
+        case FACING_UP:
+            currentDirection = FACING_LEFT;
+            break;
+        case FACING_LEFT:
+            currentDirection = FACING_DOWN;
+            break;
+        case FACING_DOWN:
+            currentDirection = FACING_RIGHT;
+            break;
+        case FACING_RIGHT:
+            currentDirection = FACING_UP;
+            break;
+    }
+    ctx.clearRect(0,0, 250, 250);
+    drawRect(currentDirection, canvasX, canvasY, width, height);
+}
+
+function rightBtn() {
+    switch(currentDirection) {
+        case FACING_UP:
+            currentDirection = FACING_RIGHT;
+            break;
+        case FACING_LEFT:
+            currentDirection = FACING_UP;
+            break;
+        case FACING_DOWN:
+            currentDirection = FACING_LEFT;
+            break;
+        case FACING_RIGHT:
+            currentDirection = FACING_DOWN;
+            break;
+    }
+    ctx.clearRect(0, 0, 250, 250);
+    drawRect(currentDirection, canvasX, canvasY, width, height);
+}
+
+function moveBtn() {
+    if((currentDirection === FACING_RIGHT) && canvasX <= 190){ 
+        canvasX = canvasX + 50; 
+    }
+    else if((currentDirection === FACING_LEFT) && canvasX > 10){
+        canvasX = canvasX - 50; 
+    }
+    else if((currentDirection === FACING_UP) && canvasY > 10) {
+        canvasY = canvasY - 50;
+    }
+    else if((currentDirection === FACING_DOWN) && canvasY <= 190){
+        canvasY = canvasY + 50;
+    }
+    ctx.clearRect(0,0, 250, 250);
+    drawRect(currentDirection, canvasX, canvasY, width, height);
+}
+
+function reportBtn() {
+    switch(currentDirection) {
+        case FACING_UP:
+            directionReport = "North";
+            break;
+        case FACING_LEFT:
+            directionReport = "West";
+            break;
+        case FACING_DOWN:
+            directionReport = "South";
+            break;
+        case FACING_RIGHT:
+            directionReport = "East";
+            break;
+    }
+    switch(canvasX) {
+        case 3:
+            canvasXReport = 1;
+            break;
+        case 53:
+            canvasXReport = 2;
+            break;
+        case 103:
+            canvasXReport = 3;
+            break;
+        case 153:
+            canvasXReport = 4;
+            break;
+        case 203:
+            canvasXReport = 5;
+            break;
+    }
+    switch(canvasY) {
+        case 203:
+            canvasYReport = 1;
+            break;
+        case 153:
+            canvasYReport = 2;
+            break;
+        case 103:
+            canvasYReport = 3;
+            break;
+        case 53:
+            canvasYReport = 4;
+            break;
+        case 3:
+            canvasYReport = 5;
+            break;
+    }
+    alert('X: ' + canvasXReport + ' Y: ' + canvasYReport + ' F: ' + directionReport);
 };
 
-function init() {
-    drawRect(FACING_DOWN, canvasX, canvasY, width, height); //Drawing Pacman on initial load
-
-    //move Pacman inside the canvas using arrow keys
-    window.onkeydown = function(event) {
-        var keyPr = event.keyCode; //Key code of key pressed
-    
-        if((keyPr === 39 | keyPr === 68) && canvasX <= 190){ 
-            canvasX = canvasX + 50; //right arrow OR 'd' add 50 from current
-            currentDirection = FACING_RIGHT;
-        }
-        else if((keyPr === 37 | keyPr === 65) && canvasX > 10){
-            canvasX = canvasX - 50; //left arrow OR 'a' subtract 50 from current
-            currentDirection = FACING_LEFT;
-        }
-        else if((keyPr === 38 | keyPr === 87) && canvasY > 10) {
-            canvasY = canvasY - 50; //top arrow OR 'w' subtract 50 from current
-            currentDirection = FACING_UP;
-        }
-        else if((keyPr === 40 | keyPr === 83) && canvasY <= 190){
-            canvasY = canvasY + 50; //bottom arrow OR 's' add 50 from current
-            currentDirection = FACING_DOWN;
-        }
-            
-        /*clearing anything drawn on canvas*/
-        ctx.clearRect(0,0, 250, 250);    
-        //Drawing Pacman at new position
-        drawRect(currentDirection, canvasX, canvasY, width, height);
-    };
-}
 </script>
 
 </body>
