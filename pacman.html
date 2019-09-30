@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+   <title>Controlling Robot</title>
+</head>
+<body>
+<p>Use arrow keys OR w, s, a, d to move around.</p>
+<canvas id="svs" width="250" height="250"></canvas>
+
+
+
+<style>
+#svs {
+    border: 1px solid black;
+    background-size: 50px 50px;
+    background-image: linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px);
+}
+</style>
+<script>
+var canvas = document.getElementById('svs');
+var ctx = canvas .getContext('2d');
+
+
+var canvasX = 103; //intial horizontal position of drawn Pacman (103)
+var canvasY = 103; //intial vertical position of drawn Pacman (103)
+var width = 50; //width of the drawn Pacman
+var height = 50; //height of the drawn Pacman
+
+let img = new Image();
+img.src = 'pacman-sprite.png';
+
+const FACING_DOWN = 47;
+const FACING_UP = 32;
+const FACING_LEFT = 17;
+const FACING_RIGHT = 0;
+let currentDirection = FACING_DOWN;
+
+function drawRect(direction, canvasX, canvasY, width, height) {
+    //drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+    ctx.drawImage(img, 0, direction, 17, 17, canvasX, canvasY, width, height);
+}
+
+img.onload = function() {
+  init();
+};
+
+function init() {
+    drawRect(FACING_DOWN, canvasX, canvasY, width, height); //Drawing Pacman on initial load
+
+    //move Pacman inside the canvas using arrow keys
+    window.onkeydown = function(event) {
+        var keyPr = event.keyCode; //Key code of key pressed
+    
+        if((keyPr === 39 | keyPr === 68) && canvasX <= 190){ 
+            canvasX = canvasX + 50; //right arrow OR 'd' add 50 from current
+            currentDirection = FACING_RIGHT;
+        }
+        else if((keyPr === 37 | keyPr === 65) && canvasX > 10){
+            canvasX = canvasX - 50; //left arrow OR 'a' subtract 50 from current
+            currentDirection = FACING_LEFT;
+        }
+        else if((keyPr === 38 | keyPr === 87) && canvasY > 10) {
+            canvasY = canvasY - 50; //top arrow OR 'w' subtract 50 from current
+            currentDirection = FACING_UP;
+        }
+        else if((keyPr === 40 | keyPr === 83) && canvasY <= 190){
+            canvasY = canvasY + 50; //bottom arrow OR 's' add 50 from current
+            currentDirection = FACING_DOWN;
+        }
+            
+        /*clearing anything drawn on canvas*/
+        ctx.clearRect(0,0, 250, 250);    
+        //Drawing Pacman at new position
+        drawRect(currentDirection, canvasX, canvasY, width, height);
+    };
+}
+</script>
+
+</body>
+</html>
